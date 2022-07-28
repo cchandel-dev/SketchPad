@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 
 public class DrawShapes extends JFrame {
     	static ArrayList<Objects> objects_to_draw;
+    	public int mode = 1;
 	public DrawShapes() {
 
 		setSize(new Dimension(320, 320));
@@ -42,6 +43,13 @@ public class DrawShapes extends JFrame {
 				   // case 6:
 				    }
 				}
+				switch(mode) {
+				     case 0: g2.draw(new Line2D.Double(x0, y0, x, y));break;
+				     case 1: g2.draw(new Rectangle(x0, y0, y, y));break;
+				     case 2: g2.draw(new Rectangle(x0, y0, x, y));break;
+				     case 3: g2.draw(new Ellipse2D.Double(x0, y0, y, y));break;
+				     case 4: g2.draw(new Ellipse2D.Double(x0, y0, x, y));break;
+				 }
 				//draw all of the accumulated shapes
 				for (int i =0 ; i < shapes.size(); i++) {
 				    g2.draw(shapes.get(i));
@@ -69,14 +77,15 @@ public class DrawShapes extends JFrame {
 	public class myMouseHandler extends MouseAdapter {
 	 public void mousePressed(MouseEvent e){ x0=e.getX(); y0=e.getY(); }
 	 public void mouseReleased(MouseEvent e) { 	    
-	     objects_to_draw.add(new Objects(1, x0, y0, x, y));
+	     objects_to_draw.add(new Objects(mode, x0, y0, x, y));
 	     repaint(); }
 	}
 	public class myMouseMotionHandler extends MouseMotionAdapter {
 	 public void mouseMoved(MouseEvent e) {  }
 	 public void mouseDragged(MouseEvent e){ 
 	     x=e.getX(); 
-	     y=e.getY(); 
+	     y=e.getY();				    
+	     repaint();
 	 }
 	}
 	//public void paint(Graphics g) {   }
