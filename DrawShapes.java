@@ -10,16 +10,20 @@ import java.awt.geom.Line2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.awt.event.*;
+
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 
 public class DrawShapes extends JFrame {
     	static ArrayList<Objects> objects_to_draw;
-    	public int mode = 1;
+    	public int mode;
+    	public static SketchOptions options;
 	public DrawShapes() {
 
-		setSize(new Dimension(320, 320));
+		setSize(new Dimension(600, 620));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		addMouseListener( new myMouseHandler());
@@ -35,20 +39,20 @@ public class DrawShapes extends JFrame {
 				    Objects temp = objects_to_draw.get(i);
 				    switch(temp.type) {
 				    case 0: shapes.add(new Line2D.Double(temp.x0, temp.y0, temp.x, temp.y));break;
-				    case 1: shapes.add(new Rectangle(temp.x0, temp.y0, temp.y, temp.y));break;
-				    case 2: shapes.add(new Rectangle(temp.x0, temp.y0, temp.x, temp.y));break;
-				    case 3: shapes.add(new Ellipse2D.Double(temp.x0, temp.y0, temp.y, temp.y));break;
-				    case 4: shapes.add(new Ellipse2D.Double(temp.x0, temp.y0, temp.x, temp.y));break;
+				    case 1: shapes.add(new Rectangle(temp.x0, temp.y0, temp.y - temp.y0, temp.y - temp.y0));break;
+				    case 2: shapes.add(new Rectangle(temp.x0, temp.y0, temp.x- temp.x0, temp.y - temp.y0));break;
+				    case 3: shapes.add(new Ellipse2D.Double(temp.x0, temp.y0, temp.y - temp.y0, temp.y - temp.y0));break;
+				    case 4: shapes.add(new Ellipse2D.Double(temp.x0, temp.y0, temp.x - temp.x0, temp.y - temp.y0));break;
 				   // case 5: 
 				   // case 6:
 				    }
 				}
-				switch(mode) {
+				switch(options.o_mode) {
 				     case 0: g2.draw(new Line2D.Double(x0, y0, x, y));break;
-				     case 1: g2.draw(new Rectangle(x0, y0, y, y));break;
-				     case 2: g2.draw(new Rectangle(x0, y0, x, y));break;
-				     case 3: g2.draw(new Ellipse2D.Double(x0, y0, y, y));break;
-				     case 4: g2.draw(new Ellipse2D.Double(x0, y0, x, y));break;
+				     case 1: g2.draw(new Rectangle(x0, y0, y - y0, y - y0));break;
+				     case 2: g2.draw(new Rectangle(x0, y0, x - x0, y - y0));break;
+				     case 3: g2.draw(new Ellipse2D.Double(x0, y0, y - y0, y - y0));break;
+				     case 4: g2.draw(new Ellipse2D.Double(x0, y0, x - x0, y - y0));break;
 				 }
 				//draw all of the accumulated shapes
 				for (int i =0 ; i < shapes.size(); i++) {
@@ -68,7 +72,8 @@ public class DrawShapes extends JFrame {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				new DrawShapes();
+				DrawShapes sketch = new DrawShapes();
+				options = new SketchOptions(); 
 				objects_to_draw = new ArrayList<Objects>();
 			}
 		});
@@ -77,7 +82,7 @@ public class DrawShapes extends JFrame {
 	public class myMouseHandler extends MouseAdapter {
 	 public void mousePressed(MouseEvent e){ x0=e.getX(); y0=e.getY(); }
 	 public void mouseReleased(MouseEvent e) { 	    
-	     objects_to_draw.add(new Objects(mode, x0, y0, x, y));
+	     objects_to_draw.add(new Objects(options.o_mode, x0, y0, x, y));
 	     repaint(); }
 	}
 	public class myMouseMotionHandler extends MouseMotionAdapter {
