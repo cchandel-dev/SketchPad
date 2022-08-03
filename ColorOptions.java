@@ -1,25 +1,27 @@
-import javax.swing.*;  
+import javax.swing.*;
+
+import java.awt.Color;
 import java.awt.event.*;  
 
-public class SketchOptions extends JFrame implements ActionListener
+public class ColorOptions extends JFrame implements ActionListener
 {
   JFrame frame;  
   JButton btn;
   JRadioButton rBtn1, rBtn2, rBtn3, rBtn4, rBtn5;
-  public int o_mode;
-  SketchOptions()
+  public Color c_mode;
+  ColorOptions()
   {
     frame = new JFrame();  
     // Create the label     
-    JLabel label = new JLabel("Select which mode you would like to draw in, and then click Submit.", JLabel.CENTER);
+    JLabel label = new JLabel("Select which color you would like to draw in, and then click Submit.", JLabel.CENTER);
     label.setBounds(20,0,200,80);  
     
     // Create the radio buttons
-    rBtn1 = new JRadioButton("Line");
-    rBtn2 = new JRadioButton("Square");
-    rBtn3 = new JRadioButton("Rectangle");  
-    rBtn4 = new JRadioButton("Circle");
-    rBtn5 = new JRadioButton("Ellipse");
+    rBtn1 = new JRadioButton("Red");
+    rBtn2 = new JRadioButton("Blue");
+    rBtn3 = new JRadioButton("Green");  
+    rBtn4 = new JRadioButton("Yellow");
+    rBtn5 = new JRadioButton("Black");
     
     // Set the position of the radio buttons
     rBtn1.setBounds(40,60,200,50);  
@@ -51,32 +53,33 @@ public class SketchOptions extends JFrame implements ActionListener
 
     frame.setSize(300,400);  
     frame.setLayout(null);  
-    frame.setVisible(true); 
+    frame.setVisible(true);  
     
-    //default is line
+    //default is red
     rBtn1.setSelected(true);
+    c_mode = Color.RED;
   }  
   
   public void actionPerformed(ActionEvent e){
     if(rBtn1.isSelected()){  
-      JOptionPane.showMessageDialog(this,"Line Mode selected."); 
-      o_mode = 0;
+      JOptionPane.showMessageDialog(this,"Red color selected."); 
+      c_mode = Color.RED;
     }  
     else if(rBtn2.isSelected()){  
-      JOptionPane.showMessageDialog(this,"Square Mode selected.");  
-      o_mode = 1;
+      JOptionPane.showMessageDialog(this,"Blue color selected.");  
+      c_mode = Color.BLUE;
     }  
     else if(rBtn3.isSelected()){  
-	JOptionPane.showMessageDialog(this,"Rectangle Mode selected.");  
-	o_mode = 2;
+	JOptionPane.showMessageDialog(this,"Green color selected.");  
+	c_mode = Color.GREEN;
     }  
     else if(rBtn4.isSelected()){  
-	JOptionPane.showMessageDialog(this,"Circle Mode selected.");  
-	o_mode = 3;
+	JOptionPane.showMessageDialog(this,"Yellow color selected.");  
+	c_mode = Color.YELLOW;
 	    }  
     else if(rBtn5.isSelected()){  
-	JOptionPane.showMessageDialog(this,"Ellipse Mode selected.");  
-	o_mode = 4;
+	JOptionPane.showMessageDialog(this,"Black color selected.");  
+	c_mode =Color.BLACK;
 	    }  
   }  
 }
