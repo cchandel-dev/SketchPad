@@ -8,6 +8,7 @@ public class Objects {
     public  ArrayList<point>points; //used for type 5 and type 6
     //x0 & y0 are the top-left corner
     //x & y are allegedly the widths
+    public Objects(){};
     public Objects(int type, int x0, int y0, int x, int y, Color col) {
 	this.x0 = x0;
 	this.y0 = y0;
