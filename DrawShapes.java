@@ -154,6 +154,8 @@ public class DrawShapes extends JFrame {
 			     Objects temp = objects_to_draw.get(selected);
 			     temp.x0 = temp.x0 + (x - x0);
 			     temp.y0 = temp.y0 + (y - y0);
+			 	 temp.x = temp.x + (x - x0);
+			 	 temp.y = temp.y + (y - y0);
 			     temp.col = select_store;
 			     objects_to_draw.set(selected, temp);
 			     repaint();
