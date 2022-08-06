@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 public class Objects {
     public int x0, y0, x, y;
+    public int xo, yo, w, h; // For representing the top left corner coordinates and dimensions of the shape.
     public Color col;
     public int type; // line = 0 , square = 1, rectangle = 2, circle = 3, ellipse = 4, polygon = 5, scribble = 6
     public  ArrayList<point>points; //used for type 5 and type 6

@@ -135,11 +135,11 @@ public class DrawShapes extends JFrame {
 	   x0=e.getX(); y0=e.getY();
 	   if(mouse.m_mode == 1) {  
 	     for(int i = 0 ; i <  objects_to_draw.size() ; i++ ) {
-		 //find the first object that we can select
-		 if (x0 > objects_to_draw.get(i).x0 && 
-			 y0 > objects_to_draw.get(i).y0 &&
-			  x0 < objects_to_draw.get(i).x + objects_to_draw.get(i).x0 &&
-			  y0 < objects_to_draw.get(i).y + objects_to_draw.get(i).y0) {
+		 //find the first object that we can select.
+		 if (x0 > objects_to_draw.get(i).xo &&
+			 y0 > objects_to_draw.get(i).yo &&
+			  x0 < objects_to_draw.get(i).xo + objects_to_draw.get(i).w &&
+			  y0 < objects_to_draw.get(i).yo + objects_to_draw.get(i).h) {
 		      selected = i;
 		  }
 	      }
@@ -159,7 +159,7 @@ public class DrawShapes extends JFrame {
 			     repaint();
 	     }
 	  else if (mouse.m_mode==0){
-	     objects_to_draw.add(new Objects(options.o_mode, x0, y0, x-x0, y-y0, colors.c_mode));
+	     objects_to_draw.add(new Objects(options.o_mode, x0, y0, x, y, colors.c_mode));
 	     myList.add("Shape Drawn " + options.o_mode);
 	      final JList<String> list = new JList<String>(myList.toArray(new String[myList.size()]));   
 	      scrollPane.setViewportView(list);
@@ -184,7 +184,6 @@ public class DrawShapes extends JFrame {
 	}
 	// Inserting classes here for better drawing of shapes.
 	public class rectangularShape extends Objects{
-		public int xo, yo, w, h; // For representing the top left corner coordinates and dimensions of the shape.
 		public int getOrig(int a, int b, int segLength){
 			if (a > b) {return a - segLength;}
 			else {return a;}
