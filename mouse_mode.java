@@ -5,7 +5,7 @@ public class mouse_mode extends JFrame implements ActionListener
 {
   JFrame frame;  
   JButton btn;
-  JRadioButton rBtn1, rBtn2;
+  JRadioButton rBtn1, rBtn2, rBtn3, rBtn4;
   public int m_mode;
   mouse_mode()
   {
@@ -16,16 +16,22 @@ public class mouse_mode extends JFrame implements ActionListener
     
     // Create the radio buttons
     rBtn1 = new JRadioButton("Draw");
-    rBtn2 = new JRadioButton("Select");
+    rBtn2 = new JRadioButton("Drag");
+    rBtn3 = new JRadioButton("Delete");
+    rBtn4 = new JRadioButton("Copy & Paste");
     
     // Set the position of the radio buttons
     rBtn1.setBounds(40,60,200,50);  
-    rBtn2.setBounds(40,100,200,50);  
+    rBtn2.setBounds(40,100,200,50); 
+    rBtn3.setBounds(40,140,200,50); 
+    rBtn4.setBounds(40,180,200,50);
     
     // Add radio buttons to group
     ButtonGroup bg = new ButtonGroup();  
     bg.add(rBtn1);
     bg.add(rBtn2);
+    bg.add(rBtn3);
+    bg.add(rBtn4);
     
     btn = new JButton("Submit");  
     btn.setBounds(100,300,80,30);  
@@ -35,6 +41,8 @@ public class mouse_mode extends JFrame implements ActionListener
     frame.add(label);
     frame.add(rBtn1);
     frame.add(rBtn2);   
+    frame.add(rBtn3); 
+    frame.add(rBtn4);
     frame.add(btn); 
 
     frame.setSize(300,400);  
@@ -51,8 +59,16 @@ public class mouse_mode extends JFrame implements ActionListener
       m_mode = 0;
     }  
     else if(rBtn2.isSelected()){  
-      JOptionPane.showMessageDialog(this,"Select Mode selected.");  
+      JOptionPane.showMessageDialog(this,"Drag Mode selected.");  
       m_mode = 1;
+    } 
+    else if(rBtn3.isSelected()){  
+	      JOptionPane.showMessageDialog(this,"Delete Mode selected.");  
+	      m_mode = 2;
+    }  
+    else if(rBtn4.isSelected()){  
+	      JOptionPane.showMessageDialog(this,"Copy & Paste Mode selected.");  
+	      m_mode = 3;
     }  
   }  
 }

@@ -1,7 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 
-public class Objects {
+public class Objects  implements java.io.Serializable {
     public int x0, y0, x, y;
     public Color col;
     public int type; // line = 0 , square = 1, rectangle = 2, circle = 3, ellipse = 4, polygon = 5, scribble = 6
