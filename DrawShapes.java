@@ -1,32 +1,21 @@
 
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 public class DrawShapes extends JFrame {
     	static ArrayList<Objects> objects_to_draw;
     	public int mode;
     	public static SketchOptions options;
     	public static ColorOptions colors;
+    	public static Save_Load save_load;
     	public static mouse_mode mouse;
     	public static List<String> myList;
     	public static JPanel panel;
@@ -34,11 +23,88 @@ public class DrawShapes extends JFrame {
     	public static JFrame frame;
     	public static int selected;
     	public static Color select_store;
+    	  //JFrame frame;  
+    	  JButton btn;
+    	  JRadioButton rBtn1, rBtn2;
+    	  JTextField address;
+    	  File file;
+    	  FileOutputStream fileOut;
+    	  boolean s_cmd;
+    	  boolean l_cmd = false;
 	public DrawShapes() {
-
 		setSize(new Dimension(600, 620));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+		    JLabel label = new JLabel("Select Save or Load for a location, and then click Submit.", JLabel.CENTER);
+		    label.setBounds(20,0,200,80);  
+		    
+		    // Create the radio buttons
+		    rBtn1 = new JRadioButton("Save");
+		    rBtn2 = new JRadioButton("Load");
+		    
+		    // Set the position of the radio buttons
+		    rBtn1.setBounds(40,60,200,50);  
+		    rBtn2.setBounds(40,100,200,50);
+		    
+		    // Add radio buttons to group
+		    ButtonGroup bg = new ButtonGroup();  
+		    bg.add(rBtn1);
+		    bg.add(rBtn2);
+		    
+		    //address text field
+		    address = new JTextField();
+		    address.setBounds(30, 200, 200, 30 );
+		    address.setText("https://");
+		    
+		    btn = new JButton("Submit");  
+		    btn.setBounds(100,300,80,30);  
+		    btn.addActionListener(new ActionListener() {
+		            @SuppressWarnings("unchecked")
+			    @Override
+		            public void actionPerformed(ActionEvent e){
+		        	    if(rBtn1.isSelected()){  
+		        	      file = new File(address.getText());
+		        	      try {
+					fileOut = new FileOutputStream(file);
+    		        	      	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+    		        	      	out.writeObject(objects_to_draw);
+    		        	      	out.close();
+    		        	      	fileOut.close();
+		        	      } catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+		        	      }
+		        	     
+		        	    }  
+		        	    else if(rBtn2.isSelected()){  
+		        		     try {
+		        		         FileInputStream fileIn = new FileInputStream(file);
+		        		         ObjectInputStream in = new ObjectInputStream(fileIn);
+		        		         objects_to_draw = (ArrayList<Objects>) in.readObject();
+		        		         in.close();
+		        		         fileIn.close();
+		        		         repaint();
+		        		      } catch (IOException i) {
+		        		         i.printStackTrace();
+		        		         return;
+		        		      } catch (ClassNotFoundException c) {
+		        		         System.out.println("Employee class not found");
+		        		         c.printStackTrace();
+		        		         return;
+		        		      }
+		        		      
+		        	    } 
+		            }  
+		        });
+		    // Add buttons to frame
+		    add(label);
+		    add(address);
+		    add(rBtn1);
+		    add(rBtn2);  
+		    add(btn); 
+		    
+		    //default is line
+		    rBtn1.setSelected(true);
 		addMouseListener( new myMouseHandler());
 		addMouseMotionListener( new myMouseMotionHandler());
 		JPanel p = new JPanel() {
@@ -117,6 +183,7 @@ public class DrawShapes extends JFrame {
 				// TODO Auto-generated method stub
 				DrawShapes sketch = new DrawShapes();
 				options = new SketchOptions();
+				//save_load = new Save_Load();
 				colors = new ColorOptions();
 				mouse = new mouse_mode();
 				objects_to_draw = new ArrayList<Objects>();
@@ -133,7 +200,8 @@ public class DrawShapes extends JFrame {
 	public class myMouseHandler extends MouseAdapter {
 	 public void mousePressed(MouseEvent e){ 
 	   x0=e.getX(); y0=e.getY();
-	   if(mouse.m_mode == 1) {  
+
+	   if(mouse.m_mode != 0 && e.getButton() == MouseEvent.BUTTON1) {  
 	     for(int i = 0 ; i <  objects_to_draw.size() ; i++ ) {
 		 //find the first object that we can select.
 		 if (x0 > objects_to_draw.get(i).xo &&
@@ -143,11 +211,23 @@ public class DrawShapes extends JFrame {
 		      selected = i;
 		  }
 	      }
+	   }
+	     if(mouse.m_mode ==1 ) {
 	      Objects temp = objects_to_draw.get(selected);
 	      select_store = temp.col;
 	      temp.col = Color.PINK;
 	      objects_to_draw.set(selected, temp);
-	   }
+	     }
+	     else if (mouse.m_mode == 2) {
+		 objects_to_draw.remove(selected);
+	     }
+	     else if(mouse.m_mode == 3 && e.getButton() == MouseEvent.BUTTON3) {
+		     //right click to paste
+		      Objects temp = objects_to_draw.get(selected);
+		      Objects mod = new Objects(temp.type, x0, y0, temp.x, temp.y, colors.c_mode);
+		      objects_to_draw.add(mod);
+		      
+	     }
 	 }
 	 public void mouseReleased(MouseEvent e) { 	   
 	     if(mouse.m_mode == 1) {  
@@ -158,7 +238,7 @@ public class DrawShapes extends JFrame {
 			 	 temp.y = temp.y + (y - y0);
 			     temp.col = select_store;
 			     objects_to_draw.set(selected, temp);
-			     repaint();
+			     
 	     }
 	  else if (mouse.m_mode==0){
 	     objects_to_draw.add(new Objects(options.o_mode, x0, y0, x, y, colors.c_mode));
@@ -172,9 +252,10 @@ public class DrawShapes extends JFrame {
 	      frame.setSize(500, 250);
 	      frame.setLocationRelativeTo(null);
 	      frame.setVisible(true);
-	     repaint();
+	     
+	  	}
+	     repaint();  
 	 }
-	     }
 	}
 	public class myMouseMotionHandler extends MouseMotionAdapter {
 	 public void mouseMoved(MouseEvent e) {  }

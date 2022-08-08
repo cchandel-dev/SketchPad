@@ -1,7 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 
-public class Objects {
+public class Objects  implements java.io.Serializable {
     public int x0, y0, x, y;
     public int xo, yo, w, h; // For representing the top left corner coordinates and dimensions of the shape.
     public Color col;
