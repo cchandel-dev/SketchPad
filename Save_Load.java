@@ -58,7 +58,6 @@ public class Save_Load extends JFrame implements ActionListener
     if(rBtn1.isSelected()){  
       JOptionPane.showMessageDialog(this,"Save Mode selected."); 
       file = new File(address.getText());
-
     }  
     else if(rBtn2.isSelected()){  
       JOptionPane.showMessageDialog(this,"Load Mode selected.");  
