@@ -11,7 +11,7 @@ import java.awt.geom.Line2D;
 import javax.swing.*;
 
 public class DrawShapes extends JFrame {
-    	static ArrayList<Objects> objects_to_draw;
+    	static ArrayList<Objects> objects_to_draw = new ArrayList<Objects>() ;
     	public int mode;
     	public static SketchOptions options;
     	public static ColorOptions colors;
@@ -25,18 +25,103 @@ public class DrawShapes extends JFrame {
     	public static int selected;
     	public static Color select_store;
         public static ArrayList<Integer> xPoints, yPoints;
+        public static int max = 1000, display_pointer = 0, last_pointer;
+        public static String Checkpoint_path= "C:\\Users\\12267\\Jave Test\\Checkpoints";
     	  //JFrame frame;  
-    	  JButton btn;
+    	  JButton btn, undo, redo;
     	  JRadioButton rBtn1, rBtn2;
     	  JTextField address;
     	  File file;
     	  FileOutputStream fileOut;
     	  boolean s_cmd;
     	  boolean l_cmd = false;
+    	public void Save(File file) {
+	      try {
+		fileOut = new FileOutputStream(file);
+  	      	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+  	      	out.writeObject(objects_to_draw);
+  	      	out.close();
+  	      	fileOut.close();
+	      } catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+	      }
+    	}
+    	public void Load(File file) {
+    	 try {
+    	     	System.out.println("file being read is called: "+file.getName());
+	         FileInputStream fileIn = new FileInputStream(file);
+	         ObjectInputStream in = new ObjectInputStream(fileIn);
+	         System.out.println("before reading object:" + objects_to_draw.size());
+	         objects_to_draw.clear();
+	         objects_to_draw = (ArrayList<Objects>) in.readObject();
+	        System.out.println("after reading object:" + objects_to_draw.size());
+	         in.close();
+	         fileIn.close();
+	         repaint();
+	      } catch (IOException i) {
+	         i.printStackTrace();
+	         return;
+	      } catch (ClassNotFoundException c) {
+	         System.out.println("Class not found");
+	         c.printStackTrace();
+	         return;
+	      }     
+    	}
+    	public void Checkpoint() {
+    	    File Checkpoint = new File(Checkpoint_path);
+    	    File[] file_array = Checkpoint.listFiles();
+    	    last_pointer = file_array.length;
+    	    display_pointer++;
+    	    if (display_pointer != last_pointer) {
+    		delete_files(display_pointer);
+    	    }
+    	    System.out.println("Checkpoint number " + display_pointer);
+    	    if(file_array.length < max && objects_to_draw != null) {
+    	    //code below in Checkpoint method is copied from -> https://www.geeksforgeeks.org/how-to-rename-all-files-of-a-folder-using-java/
+    		Save(new File(Checkpoint_path + "\\" + display_pointer + ".txt"));
+      	    }
+    	    else {
+    		JOptionPane.showMessageDialog(this,"Max Checkpoints made"); 
+    	    }
+    	}
+    	public void undo_act() {
+    	    
+    	    if(display_pointer >= 1) {
+    		Load(new File(Checkpoint_path + "\\" + display_pointer + ".txt"));
+    		display_pointer--;
+    	    }
+    	    else {
+    		JOptionPane.showMessageDialog(this,"Can't Undo any further"); 
+    	    }
+    	}
+    	public void redo_act() {
+    	   // last_pointer = file.
+    	    File Checkpoint = new File(Checkpoint_path);
+    	    File[] file_array = Checkpoint.listFiles();
+    	    last_pointer = file_array.length;
+    	    if(display_pointer <  last_pointer - 1) {
+    		display_pointer++;
+    		Load(new File(Checkpoint_path + "\\" + display_pointer + ".txt"));
+    	    }
+    	    else {
+    		JOptionPane.showMessageDialog(this,"Can't Redo any further"); 
+    	    }
+    	}
+    	public void delete_files(int start) {
+   	    File Checkpoint = new File(Checkpoint_path);
+    	    File[] file_array = Checkpoint.listFiles();
+    	    for(int i = start; i < file_array.length; i++) {
+    		file_array[i].delete();
+    	    }
+       	}
 	public DrawShapes() {
-		setSize(new Dimension(600, 620));
+		setSize(new Dimension(800, 820));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+		//delete all files in the folder
+		delete_files(0);
+		Checkpoint();
 		    JLabel label = new JLabel("Select Save or Load for a location, and then click Submit.", JLabel.CENTER);
 		    label.setBounds(20,0,200,80);  
 		    
@@ -56,43 +141,39 @@ public class DrawShapes extends JFrame {
 		    //address text field
 		    address = new JTextField();
 		    address.setBounds(30, 200, 200, 30 );
-		    address.setText("https://");
+		    address.setText(""+display_pointer);
+		   
+		    undo = new JButton("Undo");
+		    undo.setBounds(100,400,80,30); 
+		    undo.addActionListener(new ActionListener() {
+		            @SuppressWarnings("unchecked")
+			    @Override
+		            public void actionPerformed(ActionEvent e){  
+		        	undo_act();
+		            }  
+		        });
+		    redo = new JButton("Redo");
+		    redo.setBounds(100,500,80,30);
+		    redo.addActionListener(new ActionListener() {
+		            @SuppressWarnings("unchecked")
+			    @Override
+		            public void actionPerformed(ActionEvent e){  
+		        	redo_act();
+		            }  
+		        });
 		    
 		    btn = new JButton("Submit");  
 		    btn.setBounds(100,300,80,30);  
 		    btn.addActionListener(new ActionListener() {
 		            @SuppressWarnings("unchecked")
 			    @Override
-		            public void actionPerformed(ActionEvent e){
-		        	    if(rBtn1.isSelected()){  
-		        	      file = new File(address.getText());
-		        	      try {
-					fileOut = new FileOutputStream(file);
-    		        	      	ObjectOutputStream out = new ObjectOutputStream(fileOut);
-    		        	      	out.writeObject(objects_to_draw);
-    		        	      	out.close();
-    		        	      	fileOut.close();
-		        	      } catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-		        	      }
+		            public void actionPerformed(ActionEvent e){  
+		        	    file = new File(address.getText());
+		        	    if(rBtn1.isSelected()){
+		        	      Save(file);
 		        	    }  
 		        	    else if(rBtn2.isSelected()){  
-		        		     try {
-		        		         FileInputStream fileIn = new FileInputStream(file);
-		        		         ObjectInputStream in = new ObjectInputStream(fileIn);
-		        		         objects_to_draw = (ArrayList<Objects>) in.readObject();
-		        		         in.close();
-		        		         fileIn.close();
-		        		         repaint();
-		        		      } catch (IOException i) {
-		        		         i.printStackTrace();
-		        		         return;
-		        		      } catch (ClassNotFoundException c) {
-		        		         System.out.println("Class not found");
-		        		         c.printStackTrace();
-		        		         return;
-		        		      }     
+		        		Load(file);
 		        	    } 
 		            }  
 		        });
@@ -102,6 +183,8 @@ public class DrawShapes extends JFrame {
 		    add(rBtn1);
 		    add(rBtn2);  
 		    add(btn); 
+		    add(undo);
+		    add(redo);
 		    
 		    //default is line
 		    rBtn1.setSelected(true);
@@ -112,7 +195,7 @@ public class DrawShapes extends JFrame {
 			public void paintComponent(Graphics g) {
 		                Graphics2D g2 = (Graphics2D) g;
 		                shapes = new ArrayList <Shape>();
-
+		                address.setText(""+display_pointer);
 		                //take all of the objects and add them to a shapes array
 		                for (int i = 0; i < objects_to_draw.size(); i++) {
 		                    Objects temp = objects_to_draw.get(i);
@@ -198,8 +281,7 @@ public class DrawShapes extends JFrame {
 		                                    objects_to_draw.get(i).xPts[j], objects_to_draw.get(i).yPts[j]);
 		                    }
 		                }
-
-		            }
+			}
 		        };
 		        setTitle("Sketch Pad");
 		        this.getContentPane().add(p);
@@ -214,7 +296,6 @@ public class DrawShapes extends JFrame {
 				//save_load = new Save_Load();
 				colors = new ColorOptions();
 				mouse = new mouse_mode();
-				objects_to_draw = new ArrayList<Objects>();
 		                xPoints = new ArrayList<Integer>();
 		                yPoints = new ArrayList<Integer>();
 			}
@@ -225,8 +306,6 @@ public class DrawShapes extends JFrame {
 	    public class myMouseHandler extends MouseAdapter {
 	        public void mousePressed(MouseEvent e){
 	            x0=e.getX(); y0=e.getY();
-		    System.out.println("mouse pressed");
-
 	            if(mouse.m_mode != 0 && e.getButton() == MouseEvent.BUTTON1) {
 	                for (int i = 0; i < objects_to_draw.size(); i++) {
 	                    //find the first object that we can click
@@ -258,11 +337,12 @@ public class DrawShapes extends JFrame {
 	                        yPoints.stream().mapToInt(Integer::intValue).toArray()));
 	                xPoints.clear();
 	                yPoints.clear();
+	                System.out.println("I am closing a polygon!");
+	                Checkpoint();
 	                repaint();
 	            }
 	        }
 		public void mouseReleased(MouseEvent e) {
-		    System.out.println("mouse released");
 	          if(mouse.m_mode==3 &&  e.getButton() == MouseEvent.BUTTON3) {
 	        	Objects temp = objects_to_draw.get(selected);
 	        	if (temp.type < 5) {
@@ -281,12 +361,14 @@ public class DrawShapes extends JFrame {
 	                        }
 	                        Objects mod = new Objects(temp.type, 0 , 0 , 0, 0, temp.col, x_points, y_points);
 		        	objects_to_draw.add(mod);
+		        	
 	        	}
+	        	Checkpoint();
 	        	repaint();
 	           }
 		    else if(mouse.m_mode == 2) {
-	        	System.out.print("hello");
 	        	objects_to_draw.remove(selected);
+	        	Checkpoint();
 	        	repaint();
 	            }
 	            else if(mouse.m_mode == 1) {
@@ -314,17 +396,21 @@ public class DrawShapes extends JFrame {
 	                       
 	                    }
 	                }
+	                Checkpoint();
 	                repaint();
 	            }
 	            else if (mouse.m_mode==0){
 	                if(options.o_mode < 5) {///option 0,1,2,3,4
 	                    objects_to_draw.add(new Objects(options.o_mode, x0, y0, x, y, colors.c_mode, null, null));
+	                    Checkpoint();
 	                    repaint();
 	                }else if(!xPoints.isEmpty() && options.o_mode != 7){//option 6 and 5
 	                    xPoints.add(x);
 	                    yPoints.add(y);
 	                    prevX = x;
 	                    prevY = y;
+	                    System.out.println("I am Painting a Polygon!");
+	                    Checkpoint();
 	                    repaint();
 
 	                }else if(!xPoints.isEmpty()){//option 7
@@ -333,6 +419,8 @@ public class DrawShapes extends JFrame {
 	                            yPoints.stream().mapToInt(Integer::intValue).toArray()));
 	                    xPoints.clear();
 	                    yPoints.clear();
+	                    System.out.println("I am Painting a Scribble!");
+	                    Checkpoint();
 	                    repaint();
 	                }
 	            }
