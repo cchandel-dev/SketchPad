@@ -1,4 +1,6 @@
-import javax.swing.*;  
+import javax.swing.*;
+
+import java.awt.*;
 import java.awt.event.*;  
 
 public class mouse_mode extends JFrame implements ActionListener
@@ -44,8 +46,10 @@ public class mouse_mode extends JFrame implements ActionListener
     frame.add(rBtn3); 
     frame.add(rBtn4);
     frame.add(btn); 
-
-    frame.setSize(300,400);  
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    int width = 300;
+    int height = 400;
+    frame.setBounds(screenSize.width - width, screenSize.height - height, width, height);
     frame.setLayout(null);  
     frame.setVisible(true); 
     

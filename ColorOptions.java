@@ -1,6 +1,8 @@
 import javax.swing.*;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.*;  
 
 public class ColorOptions extends JFrame implements ActionListener
@@ -51,7 +53,10 @@ public class ColorOptions extends JFrame implements ActionListener
     frame.add(rBtn5); 
     frame.add(btn); 
 
-    frame.setSize(300,400);  
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    int width = 300;
+    int height = 400;
+    frame.setBounds(screenSize.width - width, 0, width, height);
     frame.setLayout(null);  
     frame.setVisible(true);  
     

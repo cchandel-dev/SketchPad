@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.*;
 
 public class SketchOptions extends JFrame implements ActionListener
@@ -46,7 +49,7 @@ public class SketchOptions extends JFrame implements ActionListener
         bg.add(rBtn8);
 
         btn = new JButton("Submit");
-        btn.setBounds(100,380,80,30);
+        btn.setBounds(100,400,80,30);
         btn.addActionListener(this);
 
         // Add buttons to frame
@@ -61,7 +64,10 @@ public class SketchOptions extends JFrame implements ActionListener
         frame.add(rBtn8);
         frame.add(btn);
 
-        frame.setSize(300,500);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = 300;
+        int height = 500;
+        frame.setBounds(screenSize.width - width * 2, 0, width, height);
         frame.setLayout(null);
         frame.setVisible(true);
 
