@@ -63,7 +63,8 @@ public class SketchOptions extends JFrame implements ActionListener
         frame.add(rBtn7);
         frame.add(rBtn8);
         frame.add(btn);
-
+        
+        //setting the frame basics
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = 300;
         int height = 500;
