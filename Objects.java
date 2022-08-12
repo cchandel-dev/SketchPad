@@ -8,6 +8,8 @@ public class Objects implements java.io.Serializable{
     public int type; // line = 0 , square = 1, rectangle = 2, circle = 3, ellipse = 4, polygon = 5, scribble = 6
     public  ArrayList<point>points; //used for type 5 and type 6
     int[] xPts, yPts;
+    public boolean isGrouped = false;
+    int index;
     //x0 & y0 are the top-left corner
     //x & y are allegedly the widths
     public Objects(){};
@@ -20,11 +22,19 @@ public class Objects implements java.io.Serializable{
         this.col = col;
 
         if(xPoints != null){
-           this.xPts = xPoints;
-           this.yPts = yPoints;
+            this.xPts = xPoints;
+            this.yPts = yPoints;
         }
     }
     public class point{
         int x, y;
+    }
+
+    public void setIndex(int index){
+        this.index = index;
+    }
+
+    public int getIndex(){
+        return this.index;
     }
 }

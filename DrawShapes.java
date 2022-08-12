@@ -27,6 +27,7 @@ public class DrawShapes extends JFrame {
         public static ArrayList<Integer> xPoints, yPoints;
         public static int max = 1000, display_pointer = 0, last_pointer;
         public static String Checkpoint_path= "C:\\Users\\12267\\Jave Test\\Checkpoints";
+        public static ArrayList<Objects> group1;
     	  //JFrame frame;  
     	  JButton btn, undo, redo;
     	  JRadioButton rBtn1, rBtn2;
@@ -49,6 +50,12 @@ public class DrawShapes extends JFrame {
     	}
     	public void Load(File file) {
     	 try {
+    	     if(!group1.isEmpty()) {
+    		 for(int i = 0 ; i < group1.size(); i ++) {
+    		     group1.get(i).isGrouped = false;
+    		 }
+    		 group1.clear();
+    	     }
     	     	System.out.println("file being read is called: "+file.getName());
 	         FileInputStream fileIn = new FileInputStream(file);
 	         ObjectInputStream in = new ObjectInputStream(fileIn);
@@ -141,7 +148,7 @@ public class DrawShapes extends JFrame {
 		    //address text field
 		    address = new JTextField();
 		    address.setBounds(30, 200, 200, 30 );
-		    address.setText(""+display_pointer);
+		    address.setText("type file path here");
 		   
 		    undo = new JButton("Undo");
 		    undo.setBounds(100,400,80,30); 
@@ -195,7 +202,7 @@ public class DrawShapes extends JFrame {
 			public void paintComponent(Graphics g) {
 		                Graphics2D g2 = (Graphics2D) g;
 		                shapes = new ArrayList <Shape>();
-		                address.setText(""+display_pointer);
+		                
 		                //take all of the objects and add them to a shapes array
 		                for (int i = 0; i < objects_to_draw.size(); i++) {
 		                    Objects temp = objects_to_draw.get(i);
@@ -298,6 +305,7 @@ public class DrawShapes extends JFrame {
 				mouse = new mouse_mode();
 		                xPoints = new ArrayList<Integer>();
 		                yPoints = new ArrayList<Integer>();
+		                group1 = new ArrayList<Objects>();
 			}
 		});
 	}
@@ -307,23 +315,42 @@ public class DrawShapes extends JFrame {
 	        public void mousePressed(MouseEvent e){
 	            x0=e.getX(); y0=e.getY();
 	            if(mouse.m_mode != 0 && e.getButton() == MouseEvent.BUTTON1) {
-	                for (int i = 0; i < objects_to_draw.size(); i++) {
-	                    //find the first object that we can click
-	                    if (shapes.get(i).contains(x0, y0)) {
-	                        selected = i;
-	                        selectX = x0;
-	                        selectY = y0;
-	                        bFound = true;
-	                        break;
-	                    } else {
-	                        bFound = false;
-	                    }
-	                }
+	                    if(mouse.m_mode == 4){
+	                        for (int i = 0; i < objects_to_draw.size(); i++) {
+	                            //find the first object that we can click
+	                            if (shapes.get(i).contains(x0, y0) && !objects_to_draw.get(i).isGrouped) {
+	                                    selected = i;
+	                                    objects_to_draw.get(i).isGrouped = true;
+	                                    objects_to_draw.get(i).setIndex(i);
+	                                    group1.add(objects_to_draw.get(i));
+	                                    break;
+	                            }
+	                        }
+	                    }else if(mouse.m_mode == 5){
 
-	                Objects temp = objects_to_draw.get(selected);
-	                select_store = temp.col;
-	                temp.col = Color.PINK;
-	                objects_to_draw.set(selected, temp);
+	                        for(int i = 0; i < group1.size(); i++){
+	                            group1.get(i).setIndex(i);
+	                            group1.get(i).isGrouped = false;
+	                        }
+	                        group1.clear();
+	                    }else{
+	                        for (int i = 0; i < objects_to_draw.size(); i++) {
+	                            //find the first object that we can click
+	                            if (shapes.get(i).contains(x0, y0)) {
+	                                selected = i;
+	                                selectX = x0;
+	                                selectY = y0;
+	                                bFound = true;
+	                                break;
+	                            } else {
+	                                bFound = false;
+	                            }
+	                        }
+	                        Objects temp = objects_to_draw.get(selected);
+	                        select_store = temp.col;
+	                        temp.col = Color.PINK;
+	                        objects_to_draw.set(selected, temp);
+	                    }
 
 	            }else if(options.o_mode > 4 && xPoints.isEmpty()){
 	                prevX = x0;
@@ -337,67 +364,125 @@ public class DrawShapes extends JFrame {
 	                        yPoints.stream().mapToInt(Integer::intValue).toArray()));
 	                xPoints.clear();
 	                yPoints.clear();
-	                System.out.println("I am closing a polygon!");
 	                Checkpoint();
 	                repaint();
 	            }
 	        }
 		public void mouseReleased(MouseEvent e) {
 	          if(mouse.m_mode==3 &&  e.getButton() == MouseEvent.BUTTON3) {
-	        	Objects temp = objects_to_draw.get(selected);
-	        	if (temp.type < 5) {
-	              	int width = Math.abs(temp.x - temp.x0);
-	              	int height = Math.abs(temp.y - temp.y0);
-	        	Objects mod = new Objects(temp.type, x0 , y0 , width+x0,  height+y0, temp.col, temp.xPts, temp.yPts);
-	        	objects_to_draw.add(mod);
-	        	}
-	        	else {//for type 5,6 & 7
-	        	    	int[] x_points = new int[temp.xPts.length];
-	        	    	int[] y_points = new int[temp.yPts.length];
+	              
+	              Objects temp = objects_to_draw.get(selected);
+
+	                if(temp.isGrouped){
+	                    for(int i = 0; i < group1.size(); i++){
+	                        temp = objects_to_draw.get(group1.get(i).getIndex());
+	                        if (temp.type < 5) {
+	                            int width = Math.abs(temp.x - temp.x0);
+	                            int height = Math.abs(temp.y - temp.y0);
+	                           Objects mod = new Objects(temp.type, temp.x0 - (selectX - x0),temp.y0 - (selectY - y0), temp.x - (selectX - x0),  temp.y - (selectY - y0), temp.col, temp.xPts, temp.yPts);
+	                            objects_to_draw.add(mod);
+	                        }else {//for type 5,6 & 7
+	                            int[] x_points = new int[temp.xPts.length];
+	                            int[] y_points = new int[temp.yPts.length];
+	                            for(int j = 0; j < temp.xPts.length; j++){
+	                                //update all the points of temp
+	                                x_points[j] = temp.xPts[j] - (selectX - x0);
+	                                y_points[j] = temp.yPts[j] - (selectY - y0);
+	                            }
+	                            Objects mod = new Objects(temp.type, 0 , 0 , 0, 0, temp.col, x_points, y_points);
+	                            objects_to_draw.add(mod);
+
+	                        }
+	                    }
+	                }else{
+	                    if (temp.type < 5) {
+	                        int width = Math.abs(temp.x - temp.x0);
+	                        int height = Math.abs(temp.y - temp.y0);
+	                        Objects mod = new Objects(temp.type, x0 , y0 , width+x0,  height+y0, temp.col, temp.xPts, temp.yPts);
+	                        objects_to_draw.add(mod);
+	                    }else {//for type 5,6 & 7
+	                        int[] x_points = new int[temp.xPts.length];
+	                        int[] y_points = new int[temp.yPts.length];
 	                        for(int i = 0; i < temp.xPts.length; i++){
 	                            //update all the points of temp
 	                            x_points[i] = temp.xPts[i] - (selectX - x0);
-	                            y_points[i] = temp.yPts[i] - (selectY - y0);	                            
+	                            y_points[i] = temp.yPts[i] - (selectY - y0);
 	                        }
 	                        Objects mod = new Objects(temp.type, 0 , 0 , 0, 0, temp.col, x_points, y_points);
-		        	objects_to_draw.add(mod);
-		        	
-	        	}
-	        	Checkpoint();
-	        	repaint();
-	           }
-		    else if(mouse.m_mode == 2) {
-	        	objects_to_draw.remove(selected);
-	        	Checkpoint();
-	        	repaint();
-	            }
-	            else if(mouse.m_mode == 1) {
-
-	                if (bFound) {
-	                    Objects temp = objects_to_draw.get(selected);
-
-	                    if(temp.type > 4){
-
-	                        for(int i = 0; i < temp.xPts.length; i++){
-	                            //update all the points of temp
-	                            temp.xPts[i] = temp.xPts[i] + (x - x0);
-	                            temp.yPts[i] = temp.yPts[i] + (y - y0);
-	                            temp.col = select_store;
-	                            objects_to_draw.set(selected, temp);
-	                        }
+	                        objects_to_draw.add(mod);
 	                    }
-	                    else{
-	                        temp.x0 = temp.x0 + (x - x0);
-	                        temp.y0 = temp.y0 + (y - y0);
-	                        temp.x = temp.x + (x - x0);
-	                        temp.y = temp.y + (y - y0);
-	                        temp.col = select_store;
-	                        objects_to_draw.set(selected, temp);
-	                       
-	                    }
+	                  
 	                }
 	                Checkpoint();
 	                repaint();
+
+	            }
+	            else if(mouse.m_mode == 2) {
+
+	                if(objects_to_draw.get(selected).isGrouped){
+	                    for(int i = 0; i < group1.size(); i++){
+	                        objects_to_draw.remove(group1.get(i));
+	                    }
+	                    group1.clear();
+	                }else{
+	                    objects_to_draw.remove(selected);
+	                }
+	                Checkpoint();
+	                repaint();
+	            }
+	            else if(mouse.m_mode == 1) {
+
+	                if (bFound || !group1.isEmpty()) {
+	                    Objects temp = objects_to_draw.get(selected);
+
+	                    if(temp.isGrouped){
+
+	                        for(int k = 0; k < group1.size(); k++){
+	                            temp = group1.get(k);
+	                            if(temp.type > 4){
+	                                for(int j = 0; j < temp.xPts.length; j++){
+	                                    //update all the points of temp
+	                                    temp.xPts[j] = temp.xPts[j] + (x - x0);
+	                                    temp.yPts[j] = temp.yPts[j] + (y - y0);
+	                                    temp.col = select_store;
+	                                    objects_to_draw.set(temp.getIndex(), temp);
+	                                    repaint();
+	                                }
+	                            }else{
+	                                temp.x0 = temp.x0 + (x - x0);
+	                                temp.y0 = temp.y0 + (y - y0);
+	                                temp.x = temp.x + (x - x0);
+	                                temp.y = temp.y + (y - y0);
+	                                temp.col = select_store;
+	                                objects_to_draw.set(temp.getIndex(), temp);
+	                                repaint();
+	                            }
+	                        }
+	                    }else{
+	                        if(temp.type > 4){
+	                            for(int i = 0; i < temp.xPts.length; i++){
+	                                //update all the points of temp
+	                                temp.xPts[i] = temp.xPts[i] + (x - x0);
+	                                temp.yPts[i] = temp.yPts[i] + (y - y0);
+	                                temp.col = select_store;
+	                                objects_to_draw.set(selected, temp);
+	                                repaint();
+	                            }
+	                        }else{
+	                            temp.x0 = temp.x0 + (x - x0);
+	                            temp.y0 = temp.y0 + (y - y0);
+	                            temp.x = temp.x + (x - x0);
+	                            temp.y = temp.y + (y - y0);
+	                            temp.col = select_store;
+	                            objects_to_draw.set(selected, temp);
+	                            repaint();
+
+	                        }
+	                    }
+	                    Checkpoint();
+	                    repaint();
+	                }
+	                
 	            }
 	            else if (mouse.m_mode==0){
 	                if(options.o_mode < 5) {///option 0,1,2,3,4
@@ -409,7 +494,6 @@ public class DrawShapes extends JFrame {
 	                    yPoints.add(y);
 	                    prevX = x;
 	                    prevY = y;
-	                    System.out.println("I am Painting a Polygon!");
 	                    Checkpoint();
 	                    repaint();
 
