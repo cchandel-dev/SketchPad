@@ -38,10 +38,12 @@ public class DrawShapes extends JFrame {
 	boolean l_cmd = false;
 	
 	//generic save for our objects_to_draw variable
+	// modified from: https://stackoverflow.com/questions/11466856/java-serializable-saving
     	public void Save(File file) {
 	      try {
 		fileOut = new FileOutputStream(file);
   	      	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+  	      	//info taken from: https://www.tutorialspoint.com/java/java_serialization.htm
   	      	out.writeObject(objects_to_draw);
   	      	out.close();
   	      	fileOut.close();
@@ -52,6 +54,7 @@ public class DrawShapes extends JFrame {
     	}
     	
     	//generic load for our objects
+    	//modified from: https://stackoverflow.com/questions/11466856/java-serializable-saving
     	public void Load(File file) {
     	 try {
     	     if(!group1.isEmpty()) {

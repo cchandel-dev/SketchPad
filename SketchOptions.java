@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.*;
 
+
+// structure taken from: https://www.geeksforgeeks.org/jradiobutton-java-swing/
 public class SketchOptions extends JFrame implements ActionListener
 {
     JFrame frame;
